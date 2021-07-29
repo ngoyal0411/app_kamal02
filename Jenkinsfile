@@ -9,7 +9,7 @@ pipeline {
         def developImgName = "i-kamal02-develop"
         def developContName = "c-kamal02-develop"
         def dockerHubUsername = "kamalmittal2020"
-        def buildNumber = env.BUILD_NUMBER
+        //def buildNumber = env.BUILD_NUMBER
     }
 
     stages {
@@ -122,12 +122,12 @@ pipeline {
         //     }
         // }
 
-        stage("Deploy Docker on port 7100"){
-            steps{
-                script {
-                    bat "docker run -d --name ${contName} -p 7100:7100 ${imgName}";
-                }
-            }
-        }
+        // stage("Deploy Docker on port 7100"){
+        //     steps{
+        //         script {
+        //             bat "docker run -d --name ${contName} -p 7100:7100 ${imgName}";
+        //         }
+        //     }
+        // }
     }
 }
