@@ -17,15 +17,15 @@ pipeline {
     }
 
     stages {
-        // stage('Checkout Source Code') {
-        //     steps {
-        //         echo "Clean old checkout from workspace"
-        //         cleanWs()
-        //         echo "Source Code Checkout start"
-        //         checkout scm
-        //         echo "Source Code Checkout stop"
-        //     }
-        // }
+        stage('Checkout Source Code') {
+            steps {
+                echo "Clean old checkout from workspace"
+                cleanWs()
+                echo "Source Code Checkout start"
+                checkout scm
+                echo "Source Code Checkout stop"
+            }
+        }
 
         // stage("Nuget Restore"){
         //     steps{
