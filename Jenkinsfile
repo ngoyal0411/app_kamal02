@@ -10,7 +10,7 @@ pipeline {
         def developContName = "c-kamal02-develop"
         def dockerHubUsername = "kamalmittal2020"
         cluster_name = 'app-kamal02'
-        location = 'us-central1-c'
+        location = 'us-central1'
         credentials_id = 'TestJenkinsApi'
         project_id = 'nagp2021'
 
