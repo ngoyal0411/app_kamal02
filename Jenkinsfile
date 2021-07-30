@@ -161,7 +161,9 @@ pipeline {
                 branch 'develop';
             }
             steps{
-                step [$class: KubernetesEngineBuilder, projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'deployment.yaml', credentialsId: env.credentials_id, verifyDeployments: true]
+                script {
+                    step [$class: KubernetesEngineBuilder, projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'deployment.yaml', credentialsId: env.credentials_id, verifyDeployments: true]
+                }
             }
         }
     }
