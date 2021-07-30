@@ -4,90 +4,34 @@ pipeline {
     environment {
         SonarQubeScanner = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
         def app = ''
-        def masterImgName = "i-kamal02-master"
+        def CONTAINER_ID = ''
+        def userName = "kamal02"
         def masterContName = "c-kamal02-master"
-        def developImgName = "i-kamal02-develop"
         def developContName = "c-kamal02-develop"
         def dockerHubUsername = "kamalmittal2020"
-        //def buildNumber = env.BUILD_NUMBER
     }
 
     stages {
-        stage('Checkout Source Code') {
-            steps {
-                echo "Clean old checkout from workspace"
-                cleanWs()
-                echo "Source Code Checkout start"
-                checkout scm
-                echo "Source Code Checkout stop"
-            }
-        }
-
-        stage("Nuget Restore"){
-            steps{
-                bat "dotnet restore ${workspace}\\WebApplication2\\WebApplication2.csproj"
-            }
-        }
-
-        stage('Start SonarQube Analysis'){
-            when { 
-                branch 'master';
-            }
-            steps{
-                withSonarQubeEnv(installationName: 'Test_Sonar')  
-                 {
-                    //Scan Modules  
-                    echo 'Sonarqube scanning started'                               
-                    bat  """ ${SonarQubeScanner} -Dsonar.projectKey=using_jenkins -Dsonar.projectname=using_jenkins -Dsonar.sourceEncoding=UTF-8 -Dsonar.sources=${workspace}\\WebApplication2 -Dsonar.cs.nunit.reportsPaths=${workspace}\\NUnitResults.xml -Dsonar.verbose=true """
-                 }
-            }
-        }
-
-        // stage('Clean'){
-        //     steps{
-        //         echo "clean starts here"
-        //         // Installed MSBuild plugin and added path C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe
-        //         //{workspace} is default variable of Jenkins. It will provide path to project in jenkis
-        //         bat "dotnet clean ${workspace}\\WebApplication2\\WebApplication2.csproj"
+        // stage('Checkout Source Code') {
+        //     steps {
+        //         echo "Clean old checkout from workspace"
+        //         cleanWs()
+        //         echo "Source Code Checkout start"
+        //         checkout scm
+        //         echo "Source Code Checkout stop"
         //     }
         // }
 
-        stage('Build'){
-            steps{
-                echo "clean starts here"
-                bat "dotnet clean ${workspace}\\WebApplication2\\WebApplication2.csproj"
-                echo "Build starts here"
-                // Installed MSBuild plugin and added path C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe
-                //{workspace} is default variable of Jenkins. It will provide path to project in jenkis
-                bat "dotnet build ${workspace}\\WebApplication2.sln"
-            }
-        }
-
-        stage('Stop SonarQube Analysis'){
-            when { 
-                branch 'master';
-            }
-            steps{
-                withSonarQubeEnv(installationName: 'Test_Sonar')  
-                 {
-                    //Scan Modules  
-                    echo 'Sonarqube scanning Stopped'                               
-                    //bat  """ ${SonarQubeScanner} -Dsonar.projectKey=using_jenkins -Dsonar.projectname=using_jenkins -Dsonar.sourceEncoding=UTF-8 -Dsonar.sources=${workspace}\\WebApplication2 -Dsonar.cs.nunit.reportsPaths=${workspace}\\NUnitResults.xml -Dsonar.verbose=true """
-                 }
-            }
-        }
-
-        // stage('Unit Test'){
+        // stage("Nuget Restore"){
         //     steps{
-        //         script{
-        //             def nunit = "${workspace}\\NUnit\\extension\\netcoreapp3.1\\nunit3-console.exe"
-        //             echo "Unit Test Starts Here"
-        //             bat "\"${nunit}\" --result=NUnitResults.xml ${workspace}\\TestProject1\\bin\\Debug\\netcoreapp3.1\\TestProject1.dll"
-        //         }
+        //         bat "dotnet restore ${workspace}\\WebApplication2\\WebApplication2.csproj"
         //     }
         // }
 
-        // stage('Run SonarQube Analysis'){
+        // stage('Start SonarQube Analysis'){
+        //     when { 
+        //         branch 'master';
+        //     }
         //     steps{
         //         withSonarQubeEnv(installationName: 'Test_Sonar')  
         //          {
@@ -98,34 +42,111 @@ pipeline {
         //     }
         // }
 
-        stage('Docker Image'){
-            steps{
-                script{
-                    bat "cd ${workspace}\\WebApplication2"
-                    app = docker.build("${imgName}","-f ${workspace}\\WebApplication2\\Dockerfile .")
-                }
-            }
-        }
-
-        // stage('Push Docker Image to Docker Hub'){
+        // stage('Code Build'){
         //     steps{
-        //         script {
-        //             withDockerRegistry(credentialsId: 'dockercredentials', url: 'https://registry.hub.docker.com'){
-        //                 echo "tag docker image"
-        //                 bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}"
-        //                 echo "push docker image"
-        //                 bat "docker push ${dockerHubUsername}/${imgName}:latest"
-        //                 echo "delete tagged docker image from local"
-        //                 bat "docker rmi ${dockerHubUsername}/${imgName}"
-        //             }
+        //         echo "clean starts here"
+        //         bat "dotnet clean ${workspace}\\WebApplication2\\WebApplication2.csproj"
+        //         echo "Build starts here"
+        //         bat "dotnet build ${workspace}\\WebApplication2.sln"
+        //     }
+        // }
+
+        // stage('Stop SonarQube Analysis'){
+        //     when { 
+        //         branch 'master';
+        //     }
+        //     steps{
+        //         withSonarQubeEnv(installationName: 'Test_Sonar')  
+        //          {
+        //             //Scan Modules  
+        //             echo 'Sonarqube scanning Stopped'                               
+        //             //bat  """ ${SonarQubeScanner} -Dsonar.projectKey=using_jenkins -Dsonar.projectname=using_jenkins -Dsonar.sourceEncoding=UTF-8 -Dsonar.sources=${workspace}\\WebApplication2 -Dsonar.cs.nunit.reportsPaths=${workspace}\\NUnitResults.xml -Dsonar.verbose=true """
+        //          }
+        //     }
+        // }
+
+        // stage('Release Artifact'){
+        //     when { 
+        //         branch 'develop';
+        //     }
+        //     steps{
+        //             echo 'Release Artifact comes here'                               
+        //     }
+        // }
+
+        // // stage('Unit Test'){
+        // //     steps{
+        // //         script{
+        // //             def nunit = "${workspace}\\NUnit\\extension\\netcoreapp3.1\\nunit3-console.exe"
+        // //             echo "Unit Test Starts Here"
+        // //             bat "\"${nunit}\" --result=NUnitResults.xml ${workspace}\\TestProject1\\bin\\Debug\\netcoreapp3.1\\TestProject1.dll"
+        // //         }
+        // //     }
+        // // }
+
+
+        // stage('Docker Image'){
+        //     steps{
+        //         script{
+        //             def branchName = env.BRANCH_NAME
+        //             def buildNumber = env.BUILD_NUMBER
+        //             def imgName = "i-${userName}-${branchName}:${buildNumber}"
+        //             echo "create docker image"
+        //             docker.build("${imgName}","-f ${workspace}\\WebApplication2\\Dockerfile .")
         //         }
         //     }
         // }
 
-        // stage("Deploy Docker on port 7100"){
+        stage('Containers'){
+            steps{
+                parallel {
+                    stage('PreContainerCheck') {
+                        steps {
+                            CONTAINER_ID = (docker ps -a | findstr 7100)
+                            if [ $CONTAINER_ID ]
+                            then
+                               echo CONTAINER_ID
+                        }
+                    }
+                    // stage('PushtoDockerHub') {
+                    //     steps {
+                    //         script {
+                    //             def branchName = env.BRANCH_NAME
+                    //             def buildNumber = env.BUILD_NUMBER
+                    //             def imgName = "i-${userName}-${branchName}:${buildNumber}"
+                    //             withDockerRegistry(credentialsId: 'dockercredentials', url: 'https://registry.hub.docker.com'){
+                    //                 echo "tag docker image"
+                    //                 bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}"
+                    //                 echo "push docker image"
+                    //                 bat "docker push ${dockerHubUsername}/${imgName}:latest"
+                    //                 echo "delete tagged docker image from local"
+                    //                 bat "docker rmi ${dockerHubUsername}/${imgName}"
+                    //             }
+                    //         }
+                    //     }
+                    // }
+                }
+            }
+        }
+
+        // stage("Docker Deployment develop"){
+        //     when { 
+        //         branch 'develop';
+        //     }
         //     steps{
         //         script {
-        //             bat "docker run -d --name ${contName} -p 7100:7100 ${imgName}";
+        //             bat "docker run -d --name ${contName} -p 7300:7300 ${imgName}";
+        //         }
+        //     }
+        // }
+
+        // stage("Docker Deployment master"){
+        //     when { 
+        //         branch 'master';
+        //     }
+        //     steps{
+        //         script {
+        //             bat "docker run -d --name ${masterContName} -p 7200:7200 ${imgName}";
         //         }
         //     }
         // }
