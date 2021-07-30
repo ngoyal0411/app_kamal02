@@ -9,6 +9,11 @@ pipeline {
         def masterContName = "c-kamal02-master"
         def developContName = "c-kamal02-develop"
         def dockerHubUsername = "kamalmittal2020"
+        cluster_name = 'app-kamal02'
+        location = 'us-central1-c'
+        credentials_id = 'TestJenkinsApi'
+        project_id = 'NAGP2021'
+
     }
 
     stages {
@@ -97,37 +102,37 @@ pipeline {
         //     }
         // }
 
-        stage('Containers'){
-            steps{
-                parallel {
-                    stage('PreContainerCheck') {
-                        steps {
-                            CONTAINER_ID = (docker ps -a | findstr 7100)
-                            if [ $CONTAINER_ID ]
-                            then
-                               echo CONTAINER_ID
-                        }
-                    }
-                    // stage('PushtoDockerHub') {
-                    //     steps {
-                    //         script {
-                    //             def branchName = env.BRANCH_NAME
-                    //             def buildNumber = env.BUILD_NUMBER
-                    //             def imgName = "i-${userName}-${branchName}:${buildNumber}"
-                    //             withDockerRegistry(credentialsId: 'dockercredentials', url: 'https://registry.hub.docker.com'){
-                    //                 echo "tag docker image"
-                    //                 bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}"
-                    //                 echo "push docker image"
-                    //                 bat "docker push ${dockerHubUsername}/${imgName}:latest"
-                    //                 echo "delete tagged docker image from local"
-                    //                 bat "docker rmi ${dockerHubUsername}/${imgName}"
-                    //             }
-                    //         }
-                    //     }
-                    // }
-                }
-            }
-        }
+        // stage('Containers'){
+        //     steps{
+        //         parallel {
+        //             stage('PreContainerCheck') {
+        //                 steps {
+        //                     CONTAINER_ID = (docker ps -a | findstr 7100)
+        //                     if [ $CONTAINER_ID ]
+        //                     then
+        //                        echo CONTAINER_ID
+        //                 }
+        //             }
+        //             stage('PushtoDockerHub') {
+        //                 steps {
+        //                     script {
+        //                         def branchName = env.BRANCH_NAME
+        //                         def buildNumber = env.BUILD_NUMBER
+        //                         def imgName = "i-${userName}-${branchName}:${buildNumber}"
+        //                         withDockerRegistry(credentialsId: 'dockercredentials', url: 'https://registry.hub.docker.com'){
+        //                             echo "tag docker image"
+        //                             bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}"
+        //                             echo "push docker image"
+        //                             bat "docker push ${dockerHubUsername}/${imgName}:latest"
+        //                             echo "delete tagged docker image from local"
+        //                             bat "docker rmi ${dockerHubUsername}/${imgName}"
+        //                         }
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
 
         // stage("Docker Deployment develop"){
         //     when { 
@@ -150,5 +155,14 @@ pipeline {
         //         }
         //     }
         // }
+
+        stage("Kubernetes Deployment"){
+            when { 
+                branch 'develop';
+            }
+            steps{
+                step [$class: KubernetesEngineBuilder, projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifeastPattern: 'deployment.yml', credentialsId: env.credentials_id, verifyDeployments: true]
+            }
+        }
     }
 }

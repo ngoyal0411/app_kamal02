@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dotnet-app-deployment
+  namespace: kubernetes-cluster-kamal02
+  labels:
+    app: dotnet-app
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: dotnet-app
+  template:
+    metadata:
+      labels:
+        app: dotnet-app
+    spec:
+      containers:
+        - name: dotnet-app
+          image: kamalmittal2020/i-kamal02-develop:latest
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+---
+appVersion: v1
+kind: Service
+metadata:
+  name: dotnet-app
+spec:
+  type: NodePort
+  selector:
+    app: dotnet-app
+    ports:
+      - protocol: TCP
+        nodePort: 30158
+        port: 80
+        targetPort: 80
+
+
+
