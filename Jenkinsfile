@@ -12,7 +12,7 @@ pipeline {
         cluster_name = 'app-kamal02'
         location = 'us-central1-c'
         credentials_id = 'TestJenkinsApi'
-        project_id = 'NAGP2021'
+        project_id = 'nagp2021'
 
     }
 
@@ -161,7 +161,7 @@ pipeline {
                 branch 'develop';
             }
             steps{
-                step ([$class: com.google.jenkins.plugins.k8sengine.KubernetesEngineBuilder, projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'deployment.yaml', credentialsId: env.credentials_id, verifyDeployments: true])
+                step ([$class: KubernetesEngineBuilder, projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'deployment.yaml', credentialsId: env.credentials_id, verifyDeployments: true])
             }
         }
     }
