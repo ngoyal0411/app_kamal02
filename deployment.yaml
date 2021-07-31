@@ -22,11 +22,19 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+          resources:
+            requests:
+              memory: "350Mi"
+              cpu: "350m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: dotnet-app
+  namespace: kubernetes-cluster-kamal02
 spec:
   type: NodePort
   selector:
