@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dotnet-app-deployment
+  name: dotnet-app-deployment-develop
   namespace: kubernetes-cluster-kamal02
   labels:
     app: dotnet-app
@@ -29,21 +29,6 @@ spec:
             limits:
               memory: "500Mi"
               cpu: "500m"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: dotnet-app
-  namespace: kubernetes-cluster-kamal02
-spec:
-  type: NodePort
-  selector:
-    app: dotnet-app
-  ports:
-    - protocol: TCP
-      nodePort: 30158
-      port: 80
-      targetPort: 80
 
 
 
