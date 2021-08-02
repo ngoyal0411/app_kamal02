@@ -76,7 +76,7 @@ pipeline {
                 branch 'develop';
             }
             steps{
-                    bat "dotnet publish ${workspace}\\WebApplication2.sln -c Release --no-build"                         
+                    bat "dotnet publish ${workspace}\\WebApplication2.sln -c Release"                         
             }
         }
 
