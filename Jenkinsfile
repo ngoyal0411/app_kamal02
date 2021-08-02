@@ -104,7 +104,8 @@ pipeline {
                 }
                 stage('Push to DockerHub') {
                     steps {
-                        script {
+                        echo "second command"
+                        // script {
                             // def branchName = env.BRANCH_NAME
                             // def buildNumber = env.BUILD_NUMBER
                             // def imgName = "i-${userName}-${branchName}:${buildNumber}"
@@ -116,7 +117,7 @@ pipeline {
                             //     echo "delete tagged docker image from local"
                             //     bat "docker rmi ${dockerHubUsername}/${imgName}"
                             // }
-                        }
+                        // }
                     }
                 }
             }
