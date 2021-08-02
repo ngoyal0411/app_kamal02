@@ -93,37 +93,36 @@ pipeline {
         //     }
         // }
 
-        // // stage('Containers'){
-        // //     steps{
-        // //         parallel {
-        // //             stage('Pre Container Check') {
-        // //                 steps {
-        // //                     CONTAINER_ID = (docker ps -a | findstr 7100)
-        // //                     if [ $CONTAINER_ID ]
-        // //                     then
-        // //                        echo CONTAINER_ID
-        // //                 }
-        // //             }
-        // //             stage('Push to DockerHub') {
-        // //                 steps {
-        // //                     script {
-        // //                         def branchName = env.BRANCH_NAME
-        // //                         def buildNumber = env.BUILD_NUMBER
-        // //                         def imgName = "i-${userName}-${branchName}:${buildNumber}"
-        // //                         withDockerRegistry(credentialsId: 'dockercredentials', url: 'https://registry.hub.docker.com'){
-        // //                             echo "tag docker image"
-        // //                             bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}"
-        // //                             echo "push docker image"
-        // //                             bat "docker push ${dockerHubUsername}/${imgName}:latest"
-        // //                             echo "delete tagged docker image from local"
-        // //                             bat "docker rmi ${dockerHubUsername}/${imgName}"
-        // //                         }
-        // //                     }
-        // //                 }
-        // //             }
-        // //         }
-        // //     }
-        // // }
+        stage('Containers'){
+            steps{
+                parallel {
+                    stage('Pre Container Check') {
+                        steps {
+                            script {
+                                bat 'docker stop (docker ps -a | grep 7100 | cut -d " " -f 1)'
+                            }
+                        }
+                    }
+                    stage('Push to DockerHub') {
+                        steps {
+                            script {
+                                // def branchName = env.BRANCH_NAME
+                                // def buildNumber = env.BUILD_NUMBER
+                                // def imgName = "i-${userName}-${branchName}:${buildNumber}"
+                                // withDockerRegistry(credentialsId: 'dockercredentials', url: 'https://registry.hub.docker.com'){
+                                //     echo "tag docker image"
+                                //     bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}"
+                                //     echo "push docker image"
+                                //     bat "docker push ${dockerHubUsername}/${imgName}:latest"
+                                //     echo "delete tagged docker image from local"
+                                //     bat "docker rmi ${dockerHubUsername}/${imgName}"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         // stage("Docker Deployment develop"){
         //     when { 
