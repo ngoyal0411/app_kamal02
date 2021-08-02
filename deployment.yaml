@@ -22,6 +22,9 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-
+          resources:
+            requests:
+              memory: "250Mi"
+              cpu: "150m"
 
 
