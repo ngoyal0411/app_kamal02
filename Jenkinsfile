@@ -116,7 +116,7 @@ pipeline {
                                 //     bat "docker push ${dockerHubUsername}/${imgName}:latest"
                                 //     echo "delete tagged docker image from local"
                                 //     bat "docker rmi ${dockerHubUsername}/${imgName}"
-                                }
+                                // }
                             }
                         }
                     }
