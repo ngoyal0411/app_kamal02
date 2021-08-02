@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dotnet-app-deployment-develop
+  name: dotnet-app-deployment
   namespace: kubernetes-cluster-kamal02
   labels:
     app: dotnet-app
