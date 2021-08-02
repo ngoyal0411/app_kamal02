@@ -27,11 +27,11 @@ pipeline {
             }
         }
 
-        // stage("Nuget Restore"){
-        //     steps{
-        //         bat "dotnet restore ${workspace}\\WebApplication2\\WebApplication2.csproj"
-        //     }
-        // }
+        stage("Nuget Restore"){
+            steps{
+                bat "dotnet restore ${workspace}\\WebApplication2\\WebApplication2.csproj"
+            }
+        }
 
         // stage('Start SonarScanner (Unit Test)'){
         //     when { 
@@ -47,14 +47,14 @@ pipeline {
         // }
 
 
-        // stage('Code Build'){
-        //     steps{
-        //         echo "clean starts here"
-        //         bat "dotnet clean ${workspace}\\WebApplication2\\WebApplication2.csproj"
-        //         echo "Build starts here"
-        //         bat "dotnet build ${workspace}\\WebApplication2.sln"
-        //     }
-        // }
+        stage('Code Build'){
+            steps{
+                echo "clean starts here"
+                bat "dotnet clean ${workspace}\\WebApplication2\\WebApplication2.csproj"
+                echo "Build starts here"
+                bat "dotnet build ${workspace}\\WebApplication2.sln"
+            }
+        }
 
         // stage('Stop SonarQube Analysis(Completion)'){
         //     when { 
@@ -71,14 +71,14 @@ pipeline {
         //     }
         // }
 
-        // // stage('Release Artifact'){
-        // //     when { 
-        // //         branch 'develop';
-        // //     }
-        // //     steps{
-        // //             echo 'Release Artifact comes here'                               
-        // //     }
-        // // }
+        stage('Release Artifact'){
+            when { 
+                branch 'develop';
+            }
+            steps{
+                    bat "dotnet publish -c Release --no-build"                         
+            }
+        }
 
 
         // stage('Docker Image'){
@@ -147,14 +147,14 @@ pipeline {
         //     }
         // }
 
-        stage("Kubernetes Deployment"){
-            steps{
-                echo 'Kubernetes Deployment started ...'
-                step ([$class: 'KubernetesEngineBuilder', projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'deployment.yaml', credentialsId: env.credentials_id, verifyDeployments: false])
+        // stage("Kubernetes Deployment"){
+        //     steps{
+        //         echo 'Kubernetes Deployment started ...'
+        //         step ([$class: 'KubernetesEngineBuilder', projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'deployment.yaml', credentialsId: env.credentials_id, verifyDeployments: false])
 
-                step ([$class: 'KubernetesEngineBuilder', projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'service.yaml', credentialsId: env.credentials_id, verifyDeployments: false])
-                echo 'Kubernetes Deployment Finished ...'
-            }
-        }
+        //         step ([$class: 'KubernetesEngineBuilder', projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'service.yaml', credentialsId: env.credentials_id, verifyDeployments: false])
+        //         echo 'Kubernetes Deployment Finished ...'
+        //     }
+        // }
     }
 }
