@@ -25,6 +25,6 @@ spec:
           resources:
             requests:
               memory: "250Mi"
-              cpu: "0.15"
+              cpu: "0.25"
 
 
