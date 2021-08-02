@@ -33,18 +33,18 @@ pipeline {
             }
         }
 
-        // stage('Start SonarScanner (Unit Test)'){
-        //     when { 
-        //         branch 'master';
-        //     }
-        //     steps{
-        //         script{
-        //             def nunit = "${workspace}\\NUnit\\extension\\netcoreapp3.1\\nunit3-console.exe"
-        //             echo "Unit test report for Sonar Scanner"
-        //             bat "\"${nunit}\" --result=NUnitResults.xml ${workspace}\\TestProject1\\bin\\Debug\\netcoreapp3.1\\TestProject1.dll"
-        //         }
-        //     }
-        // }
+        stage('Start SonarScanner (Unit Test)'){
+            when { 
+                branch 'master';
+            }
+            steps{
+                script{
+                    def nunit = "${workspace}\\NUnit\\extension\\netcoreapp3.1\\nunit3-console.exe"
+                    echo "Unit test report for Sonar Scanner"
+                    bat "\"${nunit}\" --result=NUnitResults.xml ${workspace}\\TestProject1\\bin\\Debug\\netcoreapp3.1\\TestProject1.dll"
+                }
+            }
+        }
 
 
         stage('Code Build'){
@@ -56,20 +56,20 @@ pipeline {
             }
         }
 
-        // stage('Stop SonarQube Analysis(Completion)'){
-        //     when { 
-        //         branch 'master';
-        //     }
-        //     steps{
-        //         withSonarQubeEnv(installationName: 'Test_Sonar')  
-        //          {
-        //             //Scan Modules  
+        stage('Stop SonarQube Analysis(Completion)'){
+            when { 
+                branch 'master';
+            }
+            steps{
+                withSonarQubeEnv(installationName: 'Test_Sonar')  
+                 {
+                    //Scan Modules  
                                                   
-        //             bat  """ ${SonarQubeScanner} -Dsonar.projectKey=sonar-kamal02 -Dsonar.projectname=sonar-kamal02 -Dsonar.sourceEncoding=UTF-8 -Dsonar.sources=${workspace}\\WebApplication2 -Dsonar.cs.nunit.reportsPaths=${workspace}\\NUnitResults.xml -Dsonar.verbose=true """
-        //             echo 'Sonarqube scanning Stopped' 
-        //          }
-        //     }
-        // }
+                    bat  """ ${SonarQubeScanner} -Dsonar.projectKey=sonar-kamal02 -Dsonar.projectname=sonar-kamal02 -Dsonar.sourceEncoding=UTF-8 -Dsonar.sources=${workspace}\\WebApplication2 -Dsonar.cs.nunit.reportsPaths=${workspace}\\NUnitResults.xml -Dsonar.verbose=true """
+                    echo 'Sonarqube scanning Stopped' 
+                 }
+            }
+        }
 
         stage('Release Artifact'){
             when { 
@@ -81,17 +81,17 @@ pipeline {
         }
 
 
-        // stage('Docker Image'){
-        //     steps{
-        //         script{
-        //             def branchName = env.BRANCH_NAME
-        //             def buildNumber = env.BUILD_NUMBER
-        //             def imgName = "i-${userName}-${branchName}:${buildNumber}"
-        //             echo "create docker image"
-        //             docker.build("${imgName}","-f ${workspace}\\WebApplication2\\Dockerfile .")
-        //         }
-        //     }
-        // }
+        stage('Docker Image'){
+            steps{
+                script{
+                    def branchName = env.BRANCH_NAME
+                    def buildNumber = env.BUILD_NUMBER
+                    def imgName = "i-${userName}-${branchName}:${buildNumber}"
+                    echo "create docker image"
+                    docker.build("${imgName}","-f ${workspace}\\WebApplication2\\Dockerfile .")
+                }
+            }
+        }
 
         stage('Containers'){
             parallel {
@@ -101,6 +101,7 @@ pipeline {
                             bat """ docker ps -a | findstr 7100 > dev_port_check.txt
                                     set /p container=<dev_port_check.txt
                                     docker rm -f %container:~0,4%
+                                    del dev_port_check.txt
                                 """
                         }
                     }
@@ -126,36 +127,36 @@ pipeline {
             }
         }
 
-        // stage("Docker Deployment develop"){
-        //     when { 
-        //         branch 'develop';
-        //     }
-        //     steps{
-        //         script {
-        //             bat "docker run -d --name ${developContName} -p 7300:7300 ${imgName}";
-        //         }
-        //     }
-        // }
+        stage("Docker Deployment develop"){
+            when { 
+                branch 'develop';
+            }
+            steps{
+                script {
+                    bat "docker run -d --name ${developContName} -p 7300:7300 ${imgName}";
+                }
+            }
+        }
 
-        // stage("Docker Deployment master"){
-        //     when { 
-        //         branch 'master';
-        //     }
-        //     steps{
-        //         script {
-        //             bat "docker run -d --name ${masterContName} -p 7200:7200 ${imgName}";
-        //         }
-        //     }
-        // }
+        stage("Docker Deployment master"){
+            when { 
+                branch 'master';
+            }
+            steps{
+                script {
+                    bat "docker run -d --name ${masterContName} -p 7200:7200 ${imgName}";
+                }
+            }
+        }
 
-        // stage("Kubernetes Deployment"){
-        //     steps{
-        //         echo 'Kubernetes Deployment started ...'
-        //         step ([$class: 'KubernetesEngineBuilder', projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'deployment.yaml', credentialsId: env.credentials_id, verifyDeployments: false])
+        stage("Kubernetes Deployment"){
+            steps{
+                echo 'Kubernetes Deployment started ...'
+                step ([$class: 'KubernetesEngineBuilder', projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'deployment.yaml', credentialsId: env.credentials_id, verifyDeployments: false])
 
-        //         step ([$class: 'KubernetesEngineBuilder', projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'service.yaml', credentialsId: env.credentials_id, verifyDeployments: false])
-        //         echo 'Kubernetes Deployment Finished ...'
-        //     }
-        // }
+                step ([$class: 'KubernetesEngineBuilder', projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'service.yaml', credentialsId: env.credentials_id, verifyDeployments: false])
+                echo 'Kubernetes Deployment Finished ...'
+            }
+        }
     }
 }
