@@ -98,9 +98,10 @@ pipeline {
                 stage('Pre Container Check') {
                     steps {
                         script {
-                            bat "docker ps -a | findstr 7100 > dev_port_check.txt"
-                            bat "set /p container=<dev_port_check.txt"
-                            bat "docker rm -f %container:~0,4%"
+                            bat """ docker ps -a | findstr 7100 > dev_port_check.txt
+                                    set /p container=<dev_port_check.txt
+                                    docker rm -f %container:~0,4%
+                                """
                         }
                     }
                 }
