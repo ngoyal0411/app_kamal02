@@ -99,7 +99,7 @@ pipeline {
                     stage('Pre Container Check') {
                         steps {
                             script {
-                                bat 'docker stop (docker ps -a | grep 7100 | cut -d " " -f 1)'
+                                sh 'docker stop (docker ps -a | grep 7100 | cut -d " " -f 1)'
                             }
                         }
                     }
