@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         SonarQubeScanner = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-        def app = ''
-        def CONTAINER_ID = ''
         def userName = "kamal02"
         def masterContName = "c-kamal02-master"
         def developContName = "c-kamal02-develop"
