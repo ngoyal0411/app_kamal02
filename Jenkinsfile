@@ -111,8 +111,12 @@ pipeline {
                             def buildNumber = env.BUILD_NUMBER
                             def imgName = "i-${userName}-${branchName}"
                             withDockerRegistry(credentialsId: 'dockercredentials', url: 'https://registry.hub.docker.com'){
+                                
                                 echo "tag docker image"
-                                bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}"
+                                bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}:${buildNumber}"
+                                bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}:latest"
+                                
+
                                 echo "push docker image"
                                 bat "docker push ${dockerHubUsername}/${imgName}:${buildNumber}"
                                 bat "docker push ${dockerHubUsername}/${imgName}:latest"
@@ -132,7 +136,7 @@ pipeline {
             steps{
                 script {
                     def branchName = env.BRANCH_NAME
-                    def imgName = "i-${userName}-${branchName}"
+                    def imgName = "${dockerHubUsername}/i-${userName}-${branchName}:latest"
                     bat "docker run -d --name ${developContName} -p 7300:7300 ${imgName}";
                 }
             }
@@ -145,7 +149,7 @@ pipeline {
             steps{
                 script {
                     def branchName = env.BRANCH_NAME
-                    def imgName = "i-${userName}-${branchName}"
+                    def imgName = "${dockerHubUsername}/i-${userName}-${branchName}:latest"
                     bat "docker run -d --name ${masterContName} -p 7200:7200 ${imgName}";
                 }
             }
