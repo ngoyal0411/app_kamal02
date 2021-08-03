@@ -92,13 +92,30 @@ pipeline {
 
         stage('Containers'){
             parallel {
-                stage('Pre Container Check') {
+                stage('Pre Container Check develop') {
+                    when { 
+                        branch 'develop';
+                    }
                     steps {
                         script {
-                            bat """ docker ps -a | findstr 7100 > dev_port_check.txt
+                            bat """ docker ps -a | findstr 7300 > dev_port_check.txt
                                     set /p container=<dev_port_check.txt
                                     docker rm -f %container:~0,4%
                                     del dev_port_check.txt
+                                """
+                        }
+                    }
+                }
+                stage('Pre Container Check master') {
+                    when { 
+                        branch 'master';
+                    }
+                    steps {
+                        script {
+                            bat """ docker ps -a | findstr 7200 > master_port_check.txt
+                                    set /p container=<master_port_check.txt
+                                    docker rm -f %container:~0,4%
+                                    del master_port_check.txt
                                 """
                         }
                     }
