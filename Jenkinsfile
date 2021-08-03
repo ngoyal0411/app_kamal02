@@ -31,6 +31,14 @@ pipeline {
             }
         }
 
+        stage('Code Build'){
+            steps{
+                echo "clean starts here"
+                bat "dotnet clean ${workspace}\\WebApplication2\\WebApplication2.csproj"
+                echo "Build starts here"
+                bat "dotnet build ${workspace}\\WebApplication2.sln"
+            }
+        }
         stage('Start SonarScanner (Unit Test)'){
             when { 
                 branch 'master';
@@ -43,17 +51,6 @@ pipeline {
                 }
             }
         }
-
-
-        stage('Code Build'){
-            steps{
-                echo "clean starts here"
-                bat "dotnet clean ${workspace}\\WebApplication2\\WebApplication2.csproj"
-                echo "Build starts here"
-                bat "dotnet build ${workspace}\\WebApplication2.sln"
-            }
-        }
-
         stage('Stop SonarQube Analysis(Completion)'){
             when { 
                 branch 'master';
@@ -127,7 +124,7 @@ pipeline {
                             def branchName = env.BRANCH_NAME
                             def buildNumber = env.BUILD_NUMBER
                             def imgName = "i-${userName}-${branchName}"
-                            withDockerRegistry(credentialsId: 'dockercredentials', url: 'https://registry.hub.docker.com'){
+                            withDockerRegistry(credentialsId: 'DockerHub', url: 'https://registry.hub.docker.com'){
                                 
                                 echo "tag docker image"
                                 bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}:${buildNumber}"
