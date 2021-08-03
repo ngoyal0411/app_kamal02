@@ -20,7 +20,7 @@ spec:
           image: kamalmittal2020/i-kamal02-master:latest
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8088
               protocol: TCP
           resources:
             requests:
