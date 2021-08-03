@@ -164,7 +164,7 @@ pipeline {
                 script {
                     def branchName = env.BRANCH_NAME
                     def imgName = "${dockerHubUsername}/i-${userName}-${branchName}:latest"
-                    bat "docker run -d --name ${masterContName} -p 7200:7200 ${imgName}";
+                    bat "docker run -d --name ${masterContName} -p 7200:80 ${imgName}";
                 }
             }
         }
