@@ -11,7 +11,6 @@ pipeline {
         location = 'us-central1'
         credentials_id = 'TestJenkinsApi'
         project_id = 'nagp2021'
-
     }
 
     stages {
@@ -25,127 +24,131 @@ pipeline {
             }
         }
 
-        // stage("Nuget Restore"){
-        //     steps{
-        //         bat "dotnet restore ${workspace}\\WebApplication2\\WebApplication2.csproj"
-        //     }
-        // }
+        stage("Nuget Restore"){
+            steps{
+                bat "dotnet restore ${workspace}\\WebApplication2\\WebApplication2.csproj"
+            }
+        }
 
-        // stage('Start SonarScanner (Unit Test)'){
-        //     when { 
-        //         branch 'master';
-        //     }
-        //     steps{
-        //         script{
-        //             def nunit = "${workspace}\\NUnit\\extension\\netcoreapp3.1\\nunit3-console.exe"
-        //             echo "Unit test report for Sonar Scanner"
-        //             bat "\"${nunit}\" --result=NUnitResults.xml ${workspace}\\TestProject1\\bin\\Debug\\netcoreapp3.1\\TestProject1.dll"
-        //         }
-        //     }
-        // }
+        stage('Start SonarScanner (Unit Test)'){
+            when { 
+                branch 'master';
+            }
+            steps{
+                script{
+                    def nunit = "${workspace}\\NUnit\\extension\\netcoreapp3.1\\nunit3-console.exe"
+                    echo "Unit test report for Sonar Scanner"
+                    bat "\"${nunit}\" --result=NUnitResults.xml ${workspace}\\TestProject1\\bin\\Debug\\netcoreapp3.1\\TestProject1.dll"
+                }
+            }
+        }
 
 
-        // stage('Code Build'){
-        //     steps{
-        //         echo "clean starts here"
-        //         bat "dotnet clean ${workspace}\\WebApplication2\\WebApplication2.csproj"
-        //         echo "Build starts here"
-        //         bat "dotnet build ${workspace}\\WebApplication2.sln"
-        //     }
-        // }
+        stage('Code Build'){
+            steps{
+                echo "clean starts here"
+                bat "dotnet clean ${workspace}\\WebApplication2\\WebApplication2.csproj"
+                echo "Build starts here"
+                bat "dotnet build ${workspace}\\WebApplication2.sln"
+            }
+        }
 
-        // stage('Stop SonarQube Analysis(Completion)'){
-        //     when { 
-        //         branch 'master';
-        //     }
-        //     steps{
-        //         withSonarQubeEnv(installationName: 'Test_Sonar')  
-        //          {
-        //             //Scan Modules  
+        stage('Stop SonarQube Analysis(Completion)'){
+            when { 
+                branch 'master';
+            }
+            steps{
+                withSonarQubeEnv(installationName: 'Test_Sonar')  
+                 {
+                    //Scan Modules  
                                                   
-        //             bat  """ ${SonarQubeScanner} -Dsonar.projectKey=sonar-kamal02 -Dsonar.projectname=sonar-kamal02 -Dsonar.sourceEncoding=UTF-8 -Dsonar.sources=${workspace}\\WebApplication2 -Dsonar.cs.nunit.reportsPaths=${workspace}\\NUnitResults.xml -Dsonar.verbose=true """
-        //             echo 'Sonarqube scanning Stopped' 
-        //          }
-        //     }
-        // }
+                    bat  """ ${SonarQubeScanner} -Dsonar.projectKey=sonar-kamal02 -Dsonar.projectname=sonar-kamal02 -Dsonar.sourceEncoding=UTF-8 -Dsonar.sources=${workspace}\\WebApplication2 -Dsonar.cs.nunit.reportsPaths=${workspace}\\NUnitResults.xml -Dsonar.verbose=true """
+                    echo 'Sonarqube scanning Stopped' 
+                 }
+            }
+        }
 
-        // stage('Release Artifact'){
-        //     when { 
-        //         branch 'develop';
-        //     }
-        //     steps{
-        //             bat "dotnet publish ${workspace}\\WebApplication2.sln -c Release"                         
-        //     }
-        // }
+        stage('Release Artifact'){
+            when { 
+                branch 'develop';
+            }
+            steps{
+                    bat "dotnet publish ${workspace}\\WebApplication2.sln -c Release"                         
+            }
+        }
 
 
-        // stage('Docker Image'){
-        //     steps{
-        //         script{
-        //             def branchName = env.BRANCH_NAME
-        //             def buildNumber = env.BUILD_NUMBER
-        //             def imgName = "i-${userName}-${branchName}:${buildNumber}"
-        //             echo "create docker image"
-        //             docker.build("${imgName}","-f ${workspace}\\WebApplication2\\Dockerfile .")
-        //         }
-        //     }
-        // }
+        stage('Docker Image'){
+            steps{
+                script{
+                    def branchName = env.BRANCH_NAME
+                    def imgName = "i-${userName}-${branchName}"
+                    echo "create docker image"
+                    docker.build("${imgName}","-f ${workspace}\\WebApplication2\\Dockerfile .")
+                }
+            }
+        }
 
-        // stage('Containers'){
-        //     parallel {
-        //         stage('Pre Container Check') {
-        //             steps {
-        //                 script {
-        //                     bat """ docker ps -a | findstr 7100 > dev_port_check.txt
-        //                             set /p container=<dev_port_check.txt
-        //                             docker rm -f %container:~0,4%
-        //                             del dev_port_check.txt
-        //                         """
-        //                 }
-        //             }
-        //         }
-        //         stage('Push to DockerHub') {
-        //             steps {
-        //                 echo "second command"
-        //                 script {
-        //                     def branchName = env.BRANCH_NAME
-        //                     def buildNumber = env.BUILD_NUMBER
-        //                     def imgName = "i-${userName}-${branchName}:${buildNumber}"
-        //                     withDockerRegistry(credentialsId: 'dockercredentials', url: 'https://registry.hub.docker.com'){
-        //                         echo "tag docker image"
-        //                         bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}"
-        //                         echo "push docker image"
-        //                         bat "docker push ${dockerHubUsername}/${imgName}:latest"
-        //                         echo "delete tagged docker image from local"
-        //                         bat "docker rmi ${imgName}"
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Containers'){
+            parallel {
+                stage('Pre Container Check') {
+                    steps {
+                        script {
+                            bat """ docker ps -a | findstr 7100 > dev_port_check.txt
+                                    set /p container=<dev_port_check.txt
+                                    docker rm -f %container:~0,4%
+                                    del dev_port_check.txt
+                                """
+                        }
+                    }
+                }
+                stage('Push to DockerHub') {
+                    steps {
+                        echo "second command"
+                        script {
+                            def branchName = env.BRANCH_NAME
+                            def buildNumber = env.BUILD_NUMBER
+                            def imgName = "i-${userName}-${branchName}"
+                            withDockerRegistry(credentialsId: 'dockercredentials', url: 'https://registry.hub.docker.com'){
+                                echo "tag docker image"
+                                bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}"
+                                echo "push docker image"
+                                bat "docker push ${dockerHubUsername}/${imgName}:${buildNumber}"
+                                bat "docker push ${dockerHubUsername}/${imgName}:latest"
+                                echo "delete tagged docker image from local"
+                                bat "docker rmi ${imgName}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
-        // stage("Docker Deployment develop"){
-        //     when { 
-        //         branch 'develop';
-        //     }
-        //     steps{
-        //         script {
-        //             bat "docker run -d --name ${developContName} -p 7300:7300 ${imgName}";
-        //         }
-        //     }
-        // }
+        stage("Docker Deployment develop"){
+            when { 
+                branch 'develop';
+            }
+            steps{
+                script {
+                    def branchName = env.BRANCH_NAME
+                    def imgName = "i-${userName}-${branchName}"
+                    bat "docker run -d --name ${developContName} -p 7300:7300 ${imgName}";
+                }
+            }
+        }
 
-        // stage("Docker Deployment master"){
-        //     when { 
-        //         branch 'master';
-        //     }
-        //     steps{
-        //         script {
-        //             bat "docker run -d --name ${masterContName} -p 7200:7200 ${imgName}";
-        //         }
-        //     }
-        // }
+        stage("Docker Deployment master"){
+            when { 
+                branch 'master';
+            }
+            steps{
+                script {
+                    def branchName = env.BRANCH_NAME
+                    def imgName = "i-${userName}-${branchName}"
+                    bat "docker run -d --name ${masterContName} -p 7200:7200 ${imgName}";
+                }
+            }
+        }
 
         stage("Kubernetes Deployment"){
             steps{
