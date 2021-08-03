@@ -11,6 +11,7 @@ pipeline {
         location = 'us-central1'
         credentials_id = 'TestJenkinsApi'
         project_id = 'nagp2021'
+
     }
 
     stages {
@@ -91,13 +92,30 @@ pipeline {
 
         stage('Containers'){
             parallel {
-                stage('Pre Container Check') {
+                stage('Pre Container Check develop') {
+                    when { 
+                        branch 'develop';
+                    }
                     steps {
                         script {
-                            bat """ docker ps -a | findstr 7100 > dev_port_check.txt
+                            bat """ docker ps -a | findstr 7300 > dev_port_check.txt
                                     set /p container=<dev_port_check.txt
                                     docker rm -f %container:~0,4%
                                     del dev_port_check.txt
+                                """
+                        }
+                    }
+                }
+                stage('Pre Container Check master') {
+                    when { 
+                        branch 'master';
+                    }
+                    steps {
+                        script {
+                            bat """ docker ps -a | findstr 7200 > master_port_check.txt
+                                    set /p container=<master_port_check.txt
+                                    docker rm -f %container:~0,4%
+                                    del master_port_check.txt
                                 """
                         }
                     }
@@ -110,8 +128,12 @@ pipeline {
                             def buildNumber = env.BUILD_NUMBER
                             def imgName = "i-${userName}-${branchName}"
                             withDockerRegistry(credentialsId: 'dockercredentials', url: 'https://registry.hub.docker.com'){
+                                
                                 echo "tag docker image"
-                                bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}"
+                                bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}:${buildNumber}"
+                                bat "docker tag ${imgName} ${dockerHubUsername}/${imgName}:latest"
+                                
+
                                 echo "push docker image"
                                 bat "docker push ${dockerHubUsername}/${imgName}:${buildNumber}"
                                 bat "docker push ${dockerHubUsername}/${imgName}:latest"
@@ -131,7 +153,7 @@ pipeline {
             steps{
                 script {
                     def branchName = env.BRANCH_NAME
-                    def imgName = "i-${userName}-${branchName}"
+                    def imgName = "${dockerHubUsername}/i-${userName}-${branchName}:latest"
                     bat "docker run -d --name ${developContName} -p 7300:7300 ${imgName}";
                 }
             }
@@ -144,7 +166,7 @@ pipeline {
             steps{
                 script {
                     def branchName = env.BRANCH_NAME
-                    def imgName = "i-${userName}-${branchName}"
+                    def imgName = "${dockerHubUsername}/i-${userName}-${branchName}:latest"
                     bat "docker run -d --name ${masterContName} -p 7200:7200 ${imgName}";
                 }
             }
