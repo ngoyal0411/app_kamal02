@@ -7,10 +7,10 @@ pipeline {
         def masterContName = "c-kamal02-master"
         def developContName = "c-kamal02-develop"
         def dockerHubUsername = "kamalmittal2020"
-        cluster_name = 'app-kamal02'
-        location = 'us-central1'
-        credentials_id = 'TestJenkinsApi'
-        project_id = 'nagp2021'
+        // cluster_name = 'app-kamal02'
+        // location = 'us-central1'
+        // credentials_id = 'TestJenkinsApi'
+        // project_id = 'nagp2021'
 
     }
 
@@ -171,11 +171,19 @@ pipeline {
 
         stage("Kubernetes Deployment"){
             steps{
-                echo 'Kubernetes Deployment started ...'
-                step ([$class: 'KubernetesEngineBuilder', projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'deployment.yaml', credentialsId: env.credentials_id, verifyDeployments: false])
+                script {
+                    echo 'Kubernetes Deployment started ...'
+                    bat "kubectl apply -f deployment.yaml"
 
-                step ([$class: 'KubernetesEngineBuilder', projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'service.yaml', credentialsId: env.credentials_id, verifyDeployments: false])
-                echo 'Kubernetes Deployment Finished ...'
+                    echo 'Kubernetes Service NodePort started ...'
+                    bat "kubectl apply -f service.yaml"
+                    echo 'Kubernetes Deployment Finished ...'
+                }
+                // echo 'Kubernetes Deployment started ...'
+                // step ([$class: 'KubernetesEngineBuilder', projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'deployment.yaml', credentialsId: env.credentials_id, verifyDeployments: false])
+
+                // step ([$class: 'KubernetesEngineBuilder', projectId: env.project_id, clusterName: env.cluster_name, location: env.location, manifestPattern: 'service.yaml', credentialsId: env.credentials_id, verifyDeployments: false])
+                // echo 'Kubernetes Deployment Finished ...'
             }
         }
     }
