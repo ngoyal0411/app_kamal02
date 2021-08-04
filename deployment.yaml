@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dotnet-app-deployment-develop
-  namespace: kubernetes-cluster-kamal02
   labels:
     app: dotnet-app
 spec:
@@ -22,6 +21,9 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-
+          resources:
+            requests:
+              memory: "200Mi"
+              cpu: "0.15"
 
 
