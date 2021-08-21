@@ -35,33 +35,6 @@ pipeline {
                 bat "dotnet build ${workspace}\\WebApplication2.sln"
             }
         }
-        stage('Start SonarScanner (Unit Test)'){
-            when { 
-                branch 'master';
-            }
-            steps{
-                script{
-                    def nunit = "${workspace}\\NUnit\\extension\\netcoreapp3.1\\nunit3-console.exe"
-                    echo "Unit test report for Sonar Scanner"
-                    bat "\"${nunit}\" --result=NUnitResults.xml ${workspace}\\TestProject1\\bin\\Debug\\netcoreapp3.1\\TestProject1.dll"
-                }
-            }
-        }
-        stage('Stop SonarQube Analysis(Completion)'){
-            when { 
-                branch 'master';
-            }
-            steps{
-                withSonarQubeEnv(installationName: 'Test_Sonar')  
-                 {
-                    //Scan Modules  
-                                                  
-                    bat  """ ${SonarQubeScanner} -Dsonar.projectKey=sonar-kamal02 -Dsonar.projectname=sonar-kamal02 -Dsonar.sourceEncoding=UTF-8 -Dsonar.sources=${workspace}\\WebApplication2 -Dsonar.cs.nunit.reportsPaths=${workspace}\\NUnitResults.xml -Dsonar.verbose=true """
-                    echo 'Sonarqube scanning Stopped' 
-                 }
-            }
-        }
-
         stage('Release Artifact'){
             when { 
                 branch 'develop';
